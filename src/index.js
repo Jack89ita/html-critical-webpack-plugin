@@ -3,8 +3,9 @@ const critical = require('critical');
 
 class HtmlCriticalWebpackPlugin {
 
-  constructor(options) {
+  constructor(options,callback) {
     this.options = options;
+    this.userCallback =  callback;
   }
 
   emit(compilation, callback) {
@@ -12,8 +13,9 @@ class HtmlCriticalWebpackPlugin {
       .filter(function (filename) { return /\.css$/.test(filename); })
       .map(function (filename) { return path.join(compilation.outputOptions.path, filename); });
 
-    critical.generate(Object.assign({ css }, this.options), (err) => {
+    critical.generate(Object.assign({ css }, this.options), (err,html) => {
       callback(err);
+      this.userCallback(html);
     });
   }
 
@@ -22,7 +24,7 @@ class HtmlCriticalWebpackPlugin {
       this.emit(compilation, callback);
     });
   }
-  
+
 }
 
 module.exports = HtmlCriticalWebpackPlugin;
